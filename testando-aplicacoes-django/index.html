@@ -1,0 +1,962 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Testando aplicações Django | Francisco Souza</title>
+        <meta name="viewport" content="width=1274, user-scalable=no">
+        <link rel="stylesheet" href="/themes/fisl13/styles/style.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="list">
+        <div class="slide" id="Cover">
+            <div>
+                <section>
+                    <header>
+                        <h2>Testando aplicações Django</h2>
+                    </header>
+                    <h3>Francisco Souza</h3>
+                    <p>fss@souza.cc</p>
+                    <div>
+                        <img src="pictures/pythonbrasil_logo.png" alt="Python Brasil" />
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="slide shout" id="Google">
+            <div>
+                <section>
+                    <header>
+                        <h2>Sr. Google,<br /><span class="build">como testar apps Django?</span></h2>
+                    </header>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="View-Code">
+            <div>
+                <section>
+<pre class="build-code">
+from django import test
+
+class MySiteTestCase(test.TestCase):
+    def test_index(self):
+        resp = self.client.get('/')
+        <mark>self.assertEqual(resp.status_code, 200)</mark>
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide cover w" id="Why">
+            <div>
+                <section>
+                    <img src="pictures/why.jpg" alt="Why?" />
+                    <p>http://www.flickr.com/photos/annnna/2228189828/</p>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Hard">
+            <div>
+                <section>
+                    <header>
+                        <h2>Testando aplicações Django de maneira efetiva...</h2>
+                        <br /><br />
+                        <p class="build">com testes que fazem sentido!</p>
+                    </header>
+                    <pre class="build"><s>self.assertEqual(resp.status_code, 200)</s></pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide shout" id="Question">
+            <div>
+                <section>
+                    <header>
+                        <h2>O que você quer testar?</h2>
+                    </header>
+                </section>
+            </div>
+        </div>
+        <div class="slide shout" id="Whole">
+            <div>
+                <section>
+                    <header>
+                        <h2>O sistema inteiro?</h2>
+                    </header>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Parts">
+            <div>
+                <section>
+                    <header>
+                        <h2>Por partes</h2>
+                    </header>
+                    <ul class="build-list">
+                        <li>Uma funcionalidade?</li>
+                        <li>Por views?</li>
+                        <li>Por forms?</li>
+                        <li>Por models?</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="StartingOverAgain">
+            <div>
+                <section>
+                    <header>
+                        <h2>Começando de novo...</h2>
+                    </header>
+                    <ul class="build-list">
+                        <li>Quem já escreve testes regularmente?</li>
+                        <li>Quem já tentou escrever testes, mas esbarrou no exemplo do status_code?</li>
+                        <li>Quem nunca tentou?<br>&nbsp;</li>
+                        <li>Vamos a um exemplo básico...</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="StartProject">
+            <div>
+                <section>
+                    <header>
+                        <h2>Vitrine virtual</h2>
+                    </header>
+                    <p>Vamos construir uma vitrine virtual para uma loja conhecida mundialmente.</p>
+                    <p>Antes de mergulhar na área de comércio eletrônico, a
+                    loja gostaria de avaliar o interesse dos internautas em
+                    seus produtos.</p>
+<pre class="build">
+% django-admin.py startproject loja
+% cd loja/loja
+% django-admin.py startapp vitrine
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Package">
+            <div>
+                <section>
+                    <p>A loja tem um modelo básico: <code>Produto</code>, mas
+                    antes de fazermos o model, vamos aos testes.</p> <p
+                    class="build">Quando criamos uma app, o Django inicia a app
+                    com um arquivo <code>tests.py</code>. A primeira coisa a
+                    fazer, é transformar esse módulo em um pacote:</p>
+<pre class="build">
+% rm tests.py
+% mkdir tests
+% touch tests/__init__.py
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Models">
+            <div>
+                <section>
+                    <header>
+                        <h2>O primeiro teste</h2>
+                    </header>
+                    <p>No arquivo <code>tests/test_models.py</code>:</p>
+<pre>
+from django import test
+
+from loja.vitrine import models
+
+
+class ProdutoTestCase(test.TestCase):
+
+    def test_produto_deve_ter_nome(self):
+        fields = models.Produto._meta.get_all_field_names()
+        self.assertIn("nome", fields)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Run">
+            <div>
+                <section>
+                    <header>
+                        <h2>Como executar?</h2>
+                    </header>
+                    <p>Runner de testes do Django</p>
+                    <pre>% python manage.py test &lt;appname&gt;</pre>
+                    <ul class="build-list" style="margin-top: 20px;">
+                        <li><em>Test discovery</em> praticamente inexistente</li>
+                        <li>Exige que testes estejam declarados/importados no <code>tests.py</code> (ou <code>tests/__init__.py</code>)</li>
+                        <li>
+                            Necessidade de imports "boilerplate"
+                            <pre>from &lt;project&gt;.&lt;app&gt;.tests.&lt;test_module&gt; import *</pre>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="DoBetterRunner">
+            <div>
+                <section>
+                    <header>
+                        <h2>Podemos fazer melhor?</h2>
+                    </header>
+                    <p>Criando nosso próprio runner, com um <em>test
+                    discovery</em> mais inteligente, tirando proveito dos novos
+                    recursos de discovery do <code>unittest2</code>:</p>
+<pre style="height: 220px; overflow-y: scroll">
+from django.conf import settings
+from django.test import TestCase
+from django.test.simple import DjangoTestSuiteRunner, reorder_suite
+from django.utils.unittest import TestLoader
+
+class SmartRunner(DjangoTestSuiteRunner):
+
+    def build_suite(self, test_labels, extra_tests=None, **kwargs):
+        loader = TestLoader()
+        suite = None
+
+        if test_labels:
+            suite = loader.loadTestsFromNames(test_labels)
+
+        if suite is None:
+            suite = loader.discover(start_dir=settings.BASE_PATH)
+
+        if extra_tests:
+            for test in extra_tests:
+                suite.addTest(test)
+
+        return reorder_suite(suite, (TestCase,))
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="SettingsRunner">
+            <div>
+                <section>
+                    <header>
+                        <h2>Instalando o novo runner</h2>
+                    </header>
+                    <p>No <code>settings.py</code>:</p>
+<pre>
+import os
+
+BASE_PATH = os.path.dirname(os.path.dirname(__file__))
+TEST_RUNNER = 'loja.runner.SmartRunner'
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="NoseTests">
+            <div>
+                <section>
+                    <header>
+                        <h2>Alternativa pronta...</h2>
+                    </header>
+<pre>% pip install django-nose</pre>
+<pre>
+INSTALLED_APPS = (
+    ...
+    'django_nose',
+    ...
+)
+</pre>
+<pre>TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'</pre>
+<pre class="build">NOSE_ARGS = '--with-coverage'</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Running">
+            <div>
+                <section>
+                    <header>
+                        <h2>Executando, finalmente!</h2>
+                    </header>
+<pre style="height: 320px;">
+% python manage.py test
+Creating test database for alias 'default'...
+E
+======================================================================
+ERROR: test_produto_deve_ter_nome (loja.vitrine.tests.test_models.ProdutoTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/f/Dropbox/palestras/2012/fisl/testing-django/code/loja/loja/vitrine/tests/test_models.py", line 9, in test_produto_deve_ter_nome
+    fields = models.Produto._meta.get_all_field_names()
+AttributeError: 'module' object has no attribute 'Produto'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+FAILED (errors=1)
+Destroying test database for alias 'default'...
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="SolvingError">
+            <div>
+                <section>
+                    <header>
+                        <h2>Resolvendo erro...</h2>
+                    </header>
+<pre>
+from django.db import models
+
+
+class Produto(models.Model):
+    pass
+</pre>
+<pre class="build" style="height:188px;">
+% python manage.py test
+Creating test database for alias 'default'...
+F
+======================================================================
+FAIL: test_produto_deve_ter_nome (loja.vitrine.tests.test_models.ProdutoTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/f/Dropbox/palestras/2012/fisl/testing-django/code/loja/loja/vitrine/tests/test_models.py", line 10, in test_produto_deve_ter_nome
+    self.assertIn("nome", fields)
+AssertionError: 'nome' not found in ['id']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'...
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="SolvingFailure">
+            <div>
+                <section>
+                    <header>
+                        <h2>Resolvendo falha...</h2>
+                    </header>
+<pre>
+class Produto(models.Model):
+    nome = models.CharField(max_length=100)
+</pre>
+<pre class="build">
+% python manage.py test
+Creating test database for alias 'default'...
+.
+--------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+Destroying test database for alias 'default'...
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide cover w" id="FastForward1">
+            <div>
+                <section>
+                    <img src="pictures/hourglass.jpg" alt="Avançando">
+                    <p class="black">http://www.flickr.com/photos/lerenka/6933630720/</p>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="RegisterAdmin">
+            <div>
+                <section>
+                    <header>
+                        <h2>O model está pronto...</h2>
+                    </header>
+                    <p>Agora precisamos registrar ele no admin... <span class="build">mas antes o teste, é claro:</span></p>
+<pre class="build build-code">
+from django import test
+from django.contrib import admin as django_admin
+
+from loja.vitrine import <mark>admin</mark>, models
+
+
+class ProdutoAdminTestCase(test.TestCase):
+
+    def test_produto_deve_estar_registrado(self):
+        self.assertIn(models.Produto, django_admin.site._registry)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="RegisteredAdmin">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar</h2>
+                    </header>
+<pre>
+from django.contrib import admin
+
+from loja.vitrine import models
+
+admin.site.register(models.Produto)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide cover w" id="FastForward2">
+            <div>
+                <section>
+                    <img src="pictures/hourglass.jpg" alt="Avançando">
+                    <p class="black">http://www.flickr.com/photos/lerenka/6933630720/</p>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="StatusDone">
+            <div>
+                <section>
+                    <header>
+                        <h2>Status</h2>
+                    </header>
+                    <ul class="build-list">
+                        <li>Vitrine no ar</li>
+                        <li>Clientes da loja comentando sobre os produtos por aí</li>
+                        <li>Dono da loja ainda acha que não vale a pena vender online</li>
+                        <li>Ainda assim, o dono decide colocar um formulário de contato para que os clientes que querem comprar</li>
+                        <li>Após o contato por formulário, a loja entra em contato por telefone para efetuar a venda</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="OutsideIn">
+            <div>
+                <section>
+                    <header>
+                        <h2>De fora pra dentro...</h2>
+                    </header>
+                    <p>Que tal começar esse teste de fora pra dentro?</p>
+                    <p class="build">Para tal, primeiro vamos escrever um teste de aceitação, que de fato sobe o servidor e preenche o formulário e submete o formulário pelo browser.</p>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="LiveServerTestCase">
+            <div>
+                <section>
+                    <header>
+                        <h2>LiveServerTestCase</h2>
+                    </header>
+                    <p>Utilizando um recurso recente do Django 1.4, o <code>LiveServerTestCase</code>, fica fácil subir o servidor para os testes:</p>
+<pre class="build">
+from django import test
+
+
+class FormularioDeContatoTestCase(test.LiveServerTestCase):
+    pass
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Splinter">
+            <div>
+                <section>
+                    <header>
+                        <h2>Splinter</h2>
+                    </header>
+                    <p>Utilizando o <a href="http://splinter.cobrateam.info" target="_blank">splinter</a>, fica fácil interagir com o browser:</p>
+<pre class="build">
+&gt;&gt;&gt; from splinter import Browser
+&gt;&gt;&gt; b = Browser("firefox")
+&gt;&gt;&gt; b.visit("http://fisl.org.br/13")
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="Joining">
+            <div>
+                <section>
+                    <p>Juntando tudo, eis o nosso teste de aceitação:</p>
+<pre style="height: 400px;">
+import splinter
+from django import test
+from django.conf import settings
+from django.core import mail
+
+
+class PaginaDeContatoTestCase(test.LiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.browser = splinter.Browser("firefox")
+        super(PaginaDeContatoTestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        super(PaginaDeContatoTestCase, cls).tearDownClass()
+
+    def test_preenche_formulario_e_envia_email(self):
+        self.browser.visit("%s/contato" % self.live_server_url)
+        self.browser.fill("nome", "Francisco Souza")
+        self.browser.fill("email", "fss@corp.globo.com")
+        self.browser.fill("mensagem", "Gostei do notebook azul")
+        self.browser.find_by_css("button").click()
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts1">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <mark>self.browser.visit("%s/contato" % self.live_server_url)</mark>
+        self.browser.fill("nome", "Francisco Souza")
+        self.browser.fill("email", "fss@corp.globo.com")
+        self.browser.fill("mensagem", "Gostei do notebook azul")
+        self.browser.find_by_css("button").click()
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="UrlResolve">
+            <div>
+                <section>
+                    <header>
+                        <h2>Quem responde por /contato?</h2>
+                    </header>
+<pre class="mark-code build">
+...
+
+class ContatoViewTestCase(test.TestCase):
+
+    def test_deve_responder_pela_url_contato(self):
+        r = urlresolvers.resolve("/contato")
+        expected_func = <mark>views.Contato</mark>.as_view()
+        got_func = r.func
+        self.assertEqual(expected_func.func_name, got_func.func_name)
+</pre>
+<div class="build">
+<pre class="build mark-code">
+urlpatterns = patterns('',
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^contato$', <mark>views.Contato.as_view()</mark>, name='contato'),
+)
+</pre>
+</div>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactView">
+            <div>
+                <section>
+                    <header>
+                        <h2>Quem responde por /contato?</h2>
+                    </header>
+<pre class="build">
+from django.views.generic import base
+
+
+class Contato(base.View):
+    pass
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts2">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <s>self.browser.visit("%s/contato" % self.live_server_url)</s>
+        <mark>self.browser.fill("nome", "Francisco Souza")</mark>
+        self.browser.fill("email", "fss@corp.globo.com")
+        self.browser.fill("mensagem", "Gostei do notebook azul")
+        self.browser.find_by_css("button").click()
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="RenderTemplate1">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando template</h2>
+                    </header>
+<pre class="mark-code build">
+...
+
+class ContatoViewTestCase(test.TestCase):
+    ...
+
+    def test_deve_renderizar_template_contato_html(self):
+        self.assertEqual("contato.html", <mark>views.Contato.template_name</mark>)
+</pre>
+<pre class="build">
+class Contato(base.View):
+    template_name = "contato.html"
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="RenderTemplate2">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando template</h2>
+                    </header>
+                    <div class="build">
+<pre class="build mark-code">
+...
+
+class ContatoViewTestCase(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.factory = test.RequestFactory()
+
+    ...
+
+    def test_get_deve_retornar_template_response(self):
+        request = self.factory.get("/contato")
+        v = views.Contato()
+        resp = <mark>v.get(request)</mark>
+        self.assertIsInstance(resp, response.TemplateResponse)
+        self.assertEqual(v.template_name, resp.template_name)
+</pre>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="RenderTemplate3">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando template</h2>
+                    </header>
+<pre class="build">
+from django.template import response
+
+...
+
+class Contato(base.View):
+    template_name = "contato.html"
+
+    def get(self, request):
+        return response.TemplateResponse(request, self.template_name)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="FormContext1">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando formulário no template</h2>
+                    </header>
+<pre class="build mark-code">
+class ContatoViewTestCase(test.TestCase):
+    ...
+
+    def test_get_deve_incluir_instancia_do_formulario_de_contato_no_contexto(self):
+        request = self.factory.get("/contato")
+        v = views.Contato()
+        resp = v.get(request)
+        form = resp.context_data["form"]
+        self.assertIsInstance(form, <mark>forms.Contato</mark>)
+</pre>
+<pre class="build">
+from django import forms
+
+class Contato(forms.Form):
+    pass
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="FormContext2">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando formulário no template</h2>
+                    </header>
+                    <div class="build">
+<pre class="mark-code build">
+class FormularioContatoTestCase(test.TestCase):
+
+    def test_deve_ter_campo_nome(self):
+        <mark>self.assertIn("nome", forms.Contato.base_fields)</mark>
+
+    def test_nome_deve_ter_no_maximo_255_caracteres(self):
+        field = forms.Contato.base_fields["nome"]
+        <mark>self.assertEqual(255, field.max_length)</mark>
+</pre>
+                    </div>
+<pre class="build">
+...
+
+class Contato(forms.Form):
+    nome = forms.CharField(max_length=255)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="FormContext3">
+            <div>
+                <section>
+                    <header>
+                        <h2>Renderizando formulário no template</h2>
+                    </header>
+<pre>
+&lt;form action=&quot;&quot; method=&quot;post&quot;&gt;
+    {% csrf_token %}
+    {{ form.as_p }}
+&lt;/form&gt;
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts3">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <s>self.browser.visit("%s/contato" % self.live_server_url)</s>
+        <s>self.browser.fill("nome", "Francisco Souza")</s>
+        <mark>self.browser.fill("email", "fss@corp.globo.com")</mark>
+        self.browser.fill("mensagem", "Gostei do notebook azul")
+        self.browser.find_by_css("button").click()
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts4">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build built">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <s>self.browser.visit("%s/contato" % self.live_server_url)</s>
+        <s>self.browser.fill("nome", "Francisco Souza")</s>
+        <s>self.browser.fill("email", "fss@corp.globo.com")</s>
+        <mark>self.browser.fill("mensagem", "Gostei do notebook azul")</mark>
+        self.browser.find_by_css("button").click()
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts5">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build built">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <s>self.browser.visit("%s/contato" % self.live_server_url)</s>
+        <s>self.browser.fill("nome", "Francisco Souza")</s>
+        <s>self.browser.fill("email", "fss@corp.globo.com")</s>
+        <s>self.browser.fill("mensagem", "Gostei do notebook azul")</s>
+        <mark>self.browser.find_by_css("button").click()</mark>
+        email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="ContactParts6">
+            <div>
+                <section>
+                    <header>
+                        <h2>Fazendo o teste passar por partes...</h2>
+                    </header>
+<pre class="mark-code build built">
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        <s>self.browser.visit("%s/contato" % self.live_server_url)</s>
+        <s>self.browser.fill("nome", "Francisco Souza")</s>
+        <s>self.browser.fill("email", "fss@corp.globo.com")</s>
+        <s>self.browser.fill("mensagem", "Gostei do notebook azul")</s>
+        <s>self.browser.find_by_css("button").click()</s>
+        <mark>email = mail.outbox[0]
+        self.assertEqual(u"Contato pelo site", email.subject)
+        self.assertEqual(u"Gostei do notebook azul", email.body)
+        self.assertEqual(u"fss@corp.globo.com", email.from_email)
+        self.assertEqual([settings.EMAIL_ADMIN], email.to)</mark>
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide cover h" id="Atdd">
+            <div>
+                <section>
+                    <img src="pictures/atdd.png" alt="ATDD" />
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="DealingWithChanges">
+            <div>
+                <section>
+                    <header>
+                        <h2>Lidando com mudanças</h2>
+                    </header>
+                    <p>Os clientes começaram a reclamar da demora para envio do formulário.</p>
+                    <p class="build">Podemos resolver esse problema facilmente enviando e-mail de forma assíncrona!</p>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="MockingMailer">
+            <div>
+                <section>
+                    <header>
+                        <h2>Mockando enviador de e-mails</h2>
+                    </header>
+                    <p>Agora que há uma classe responsável por enviar e-mails, nos testes podemos utilizar uma versão falsa do objeto:</p>
+<pre class="build" style="height:280px;">
+import mock
+
+...
+
+    def test_preenche_formulario_e_envia_email(self):
+        with mock.patch('loja.vitrine.mailer.EnviadorDeEmail.enviar_email') as enviar_email:
+            self.browser.visit("%s/contato" % self.live_server_url)
+            self.browser.fill("nome", "Francisco Souza")
+            self.browser.fill("email", "fss@corp.globo.com")
+            self.browser.fill("mensagem", "Gostei do notebook azul")
+            self.browser.find_by_css("button").click()
+            enviar_email.assert_called_with(
+                assunto=u"Contato pelo site",
+                mensagem=u"Gostei do notebook azul",
+                remetente=u"fss@corp.globo.com",
+                destinatario=settings.EMAIL_ADMIN,
+            )
+</pre>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="SlowTests">
+            <div>
+                <section>
+                    <header>
+                        <h2>Testes no browser são lentos...</h2>
+                    </header>
+                    <ul class="build-list">
+                        <li>É possível testar as views sem levantar o browser</li>
+                        <li>Deixe os testes no browser para os momentos nos quais eles são indispensáveis (AJAX, por exemplo)</li>
+                        <li>
+                            Lembre-se que não testamos o que acontece além do envio do e-mail.
+                            <ul>
+                                <li>O usuário é redirecionado para uma outra página?</li>
+                                <li>O que acontece no caso de dados inválidos?</li>
+                            </ul>
+                        </li>
+                        <li>Estes casos seriam mais fáceis e mais rápidos para testar.</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="slide" id="TestView">
+            <div>
+                <section>
+                    <header>
+                        <h2>Um rápido exemplo</h2>
+                    </header>
+<pre style="height: 400px">
+class PaginaDeContatoTestCase(test.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.factory = test.RequestFactory()
+
+    def test_preenche_formulario_e_envia_email(self):
+        dados = {
+            "nome": "Francisco Souza",
+            "email": "fss@corp.globo.com",
+            "mensagem": "Gostei do notebook azul",
+        }
+        request = self.factory.post("/contato", dados)
+        with mock.patch('loja.vitrine.mailer.EnviadorDeEmail.enviar_email') as enviar_email:
+            views.Contato().post(request)
+            enviar_email.assert_called_with(
+                assunto=u"Contato pelo site",
+                mensagem=u"Gostei do notebook azul",
+                remetente=u"fss@corp.globo.com",
+                destinatario=settings.EMAIL_ADMIN,
+            )
+</pre>
+                    </section>
+                </div>
+            </div>
+            <div class="slide" id="Worked">
+                <div>
+                    <section>
+                    <header>
+                    <h2>A vitrine deu certo!</h2>
+                    </header>
+                    <ul class="build-list">
+                        <li>A quantidade de e-mails de contato é enorme.</li>
+                        <li>Não há funcionários o suficiente para retornar tantas ligações.</li>
+                        <li>O cliente decidiu finalmente fazer o comércio eletrônico!</li>
+                        <li>Mas não da tempo de fazer isso na palestra :(</li>
+                    </ul>
+                    </section>
+                </div>
+            </div>
+            <div class="slide" id="ThankYou">
+                <div>
+                    <section>
+                    <header><h2>Obrigado!</h2></header>
+                    <p>Francisco Souza<br />fss@corp.globo.com</p>
+                    <ul>
+                        <li><a href="http://twitter.com/franciscosouza">twitter.com/franciscosouza</a></li>
+                        <li><a href="http://f.souza.cc">f.souza.cc</a></li>
+                    </ul>
+                    </section>
+                </div>
+            </div>
+            <div class="slide cover" id="PythonBrasil">
+                <div>
+                    <section>
+                    <img src="pictures/slide_pythonbrasil8.png" alt="PythonBrasil[8]" />
+                    </section>
+                </div>
+            </div>
+            <div class="progress"><div></div></div>
+            <script src="/themes/scripts/script.js"></script>
+            <!-- Copyright © 2010–2012 Vadim Makeev — pepelsbey.net -->
+        </body>
+    </html>
