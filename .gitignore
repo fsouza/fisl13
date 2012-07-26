@@ -2,3 +2,4 @@
 *.db
 *.pyc
 *.sw[p-z]
+*.log
