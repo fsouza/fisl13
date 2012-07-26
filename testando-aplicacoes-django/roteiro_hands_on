@@ -1,5 +1,0 @@
-- App cliente do PagSeguro
-    #: montagem de pedido localmente
-    #: criação de checkout junto ao pagseguro
-    #: url de notificação
-    #: consultas
