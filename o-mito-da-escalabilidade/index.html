@@ -1,0 +1,818 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+<head>
+    <title>O mito da escalabilidade | Francisco Souza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1274, user-scalable=no">
+    <link rel="stylesheet" href="/themes/fisl13/styles/style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="list">
+    <div class="slide" id="Cover">
+        <div>
+            <section>
+                <header>
+                    <h2>O mito da escalabilidade</h2>
+                </header>
+                <h3>Francisco Souza</h3>
+                <p>fss@corp.globo.com</p>
+                <div>
+                    <img id="globocom" src="pictures/globo.com.png" width="169" height="105" alt="Globo.com">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="FastStory">
+        <div>
+            <section>
+                <header>
+                    <h2>Uma rápida história...</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="UltraUpload1">
+        <div>
+            <section>
+                <header>
+                    <h2>UltraUpload</h2>
+                </header>
+                <p>Você tem um nome projeto! Você vai trabalhar num site de compartilhamento de arquivos, chamado <b>UltraUpload</b>.</p>
+                <p>Cada usuário será capaz de subir seus arquivos e compartilhar links.</p>
+                <p>Além disso, também há o fator social: é possível curtir arquivos alheios, favoritar, etc.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="UltraUpload2">
+        <div>
+            <section>
+                <header>
+                    <h2>
+                        node.js<br>
+                        +<br>
+                        MongoDB
+                    </h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Broken1">
+        <div>
+            <section>
+                <img src="pictures/explode.jpg" alt="Código quebrado">
+                <p class="right">http://www.flickr.com/photos/11704965@N03/2846657279/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover h" id="Impossibru">
+        <div>
+            <section>
+                <img src="pictures/impossibru.jpg" alt="Impossibru!">
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="WhereIsTheProblem">
+        <div>
+            <section>
+                <header>
+                    <h2>Aonde está o problema?</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide center" id="Scalability-Django">
+        <div>
+            <section>
+                <img src="pictures/does-django-scale.png" alt="Django escala?">
+            </section>
+        </div>
+    </div>
+    <div class="slide center" id="Scalability-Rails">
+        <div>
+            <section>
+                <img src="pictures/does-rails-scale.png" alt="Rails escala?">
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="ScalabilityIsNot">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Scalability is not about using Java. A system built in any language using any tools can be made to scale.</p>
+                </blockquote>
+                <p>- Cal Henderson, 2006.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsScalability1">
+        <div>
+            <section>
+                <header>
+                    <h2>O que é escalabilidade?</h2>
+                </header>
+                <p>Escalabilidade é a capacidade de responder a grandes mudanças nas demandas de dados, usuários, processamento ou outros recursos computacionais.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsScalability2">
+        <div>
+            <section>
+                <header>
+                    <h2>O que é escalabilidade?</h2>
+                </header>
+                <p>De acordo com Cal Henderson, <b>aplicações</b> escaláveis:</p>
+                <ol class="build-list">
+                    <li>são capazes de lidar com o crescimento de usuários</li>
+                    <li>são capazes de lidar com o crescimento de dados</li>
+                    <li>permanecem simples e fácil de manter à medida que evoluem</li>
+                </ol>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsScalability3">
+        <div>
+            <section>
+                <header>
+                    <h2>O que é escalabilidade?</h2>
+                </header>
+                <p class="build">Além disso, também podemos incluir na lista:</p>
+                <ol class="build-list">
+                    <li>Aplicações escaláveis conseguem lidar com falhas</li>
+                    <li>Aplicações escaláveis utilizam recursos diferentes de forma adequada</li>
+                </ol>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="Nowhere">
+        <div>
+            <section>
+                <blockquote>
+                    <p>On the Internet, if you can’t scale - if you can’t get really big really fast - you’re nowhere.</p>
+                </blockquote>
+                <p>- Nicholas G. Carr, <b>2000</b>.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="HowToScale">
+        <div>
+            <section>
+                <header>
+                    <h2>Como escalar?</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Types">
+        <div>
+            <section>
+                <ol class="build-list">
+                    <li class="built">
+                        Scale up (escalabilidade vertical)
+                        <ul>
+                            <li>
+                                Adição de recursos computacionais em uma intância
+                                <ul>
+                                    <li>CPU</li>
+                                    <li>Memória</li>
+                                    <li>etc.</li>
+                                </ul>
+                            </li>
+                            <li>Mais limitada</li>
+                        </ul>
+                    </li>
+                    <li class="built">
+                        Scale out (escalabilidade horizontal)
+                        <ul>
+                            <li>Adição de novas instâncias</li>
+                            <li>Tende ao infinito :)</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="ScalingUpFailingUp">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Scaling up is failing up.</p>
+                </blockquote>
+                <p>- Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Myths">
+        <div>
+            <section>
+                <header>
+                    <h2>Mitos da escalabilidade</h2>
+                </header>
+                <ol class="build-list">
+                    <li>Se roda rápido, escala.</li>
+                    <li>Quer escalar? Usa node.js e MongoDB!</li>
+                    <li>"Deploya" na nuvem que escala.</li>
+                    <li>Ruby escala</li>
+                    <li><img src="pictures/trollface.png" alt="Trollface"></li>
+                </ol>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="PerformanceVsScalability">
+        <div>
+            <section>
+                <header>
+                    <h2>Performance<br>vs<br>Escalabilidade</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Function">
+        <div>
+            <section>
+                <header>
+                    <h2>Analise a função abaixo...</h2>
+                </header>
+<pre style="height: 350px;">
+int
+writefile(char *dirname, char *filename)
+{
+    int    fildes;
+    char   oldcwd[FILENAME_MAX];
+    getcwd(oldcwd, FILENAME_MAX / (sizeof (char)));
+    if (chdir(dirname) == 0) {
+        fildes = open(filename, O_WRONLY|O_CREAT|O_CLOEXEC, 0644);
+        if (fildes == -1) {
+            printf("Failed to open %s file.\n", filename);
+            chdir(oldcwd);
+            return 1;
+        }
+        if (write(fildes, MSG, N) != N) {
+            printf("Failed to write %s in %s", MSG, filename);
+            chdir(oldcwd);
+            return 1;
+        }
+        chdir(oldcwd);
+        return 0;
+    } else {
+        printf("Directory %s does not exist.\n", dirname);
+        chdir(oldcwd);
+        return 1;
+    }
+}
+</pre>
+                <div class="build overlay">
+                    <br><br>Ela roda rápido?
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="FunctionScale">
+        <div>
+            <section>
+                <header>
+                    <h2>Analise a função abaixo...</h2>
+                </header>
+<pre style="height: 350px;">
+int
+writefile(char *dirname, char *filename)
+{
+    int    fildes;
+    char   oldcwd[FILENAME_MAX];
+    getcwd(oldcwd, FILENAME_MAX / (sizeof (char)));
+    if (chdir(dirname) == 0) {
+        fildes = open(filename, O_WRONLY|O_CREAT|O_CLOEXEC, 0644);
+        if (fildes == -1) {
+            printf("Failed to open %s file.\n", filename);
+            chdir(oldcwd);
+            return 1;
+        }
+        if (write(fildes, MSG, N) != N) {
+            printf("Failed to write %s in %s", MSG, filename);
+            chdir(oldcwd);
+            return 1;
+        }
+        chdir(oldcwd);
+        return 0;
+    } else {
+        printf("Directory %s does not exist.\n", dirname);
+        chdir(oldcwd);
+        return 1;
+    }
+}
+</pre>
+                <div class="build overlay built">
+                    <br><br>Ela escala?
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="FuncMarked">
+        <div>
+            <section>
+<pre style="height: 500px; margin-top: -50px;" class="build mark-code">
+int
+writefile(char *dirname, char *filename)
+{
+    int    fildes;
+    char   oldcwd[FILENAME_MAX];
+    <mark>getcwd(oldcwd, FILENAME_MAX / (sizeof (char)))</mark>;
+    if (<mark>chdir(dirname)</mark> == 0) {
+        fildes = <mark class="another">open(filename, O_WRONLY|O_CREAT|O_CLOEXEC, 0644);</mark>
+        if (fildes == -1) {
+            printf("Failed to open %s file.\n", filename);
+            <mark>chdir(oldcwd)</mark>;
+            return 1;
+        }
+        if (<mark class="another">write(fildes, MSG, N)</mark> != N) {
+            printf("Failed to write %s in %s", MSG, filename);
+            <mark>chdir(oldcwd)</mark>;
+            return 1;
+        }
+        <mark>chdir(oldcwd)</mark>;
+        return 0;
+    } else {
+        printf("Directory %s does not exist.\n", dirname);
+        <mark>chdir(oldcwd)</mark>;
+        return 1;
+    }
+}
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="NodeNotTheAnswer">
+        <div>
+            <section>
+                <header>
+                    <h2>node.js não é a resposta!</h2>
+                </header>
+                <p class="build">Nem CoffeeScript, C, Java, Scala, Clojure, Ruby, Python, etc.</p>
+                <p class="build">Escalabilidade não está na tecnologia, está na aplicação <span class="build">e na equipe!</span></p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ElasticNotScalability">
+        <div>
+            <section>
+                <header>
+                    <h2>Escalabilidade != elasticidade</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Elasticididade == adaptabilidade</li>
+                    <li>Implantar uma aplicação em uma infraestrutura elástica não garante que ela vai escalar<br>&nbsp;</li>
+                    <li>Você nunca viu uma aplicação EC2 cair por que "não aguentou a pressão"?</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="ElasticityAdvantage">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Taking advantage of elasticity usually requires a scalable system, otherwise the extra resources will have little effect.</p>
+                </blockquote>
+                <p>Henry Robinson, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="TwitterScalability">
+        <div>
+            <section>
+                <img src="pictures/twitter-scale.jpg" alt="Can Ruby scale?">
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="LessIsMore">
+        <div>
+            <section>
+                <header>
+                    <h2>Menos é mais</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Não se exceda!</li>
+                    <li>Quanto menos código você escreve, menos complexo é a aplicação.</li>
+                    <li>Quanto menor a complexidade da aplicação, maior a facilidade em escala-la.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="Reducing">
+        <div>
+            <section>
+                <blockquote>
+                    <p>reducing is the name of the game for <b>performance</b> improvements and increased <b>scalability</b>.</p>
+                </blockquote>
+                <p>Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="ProjectToFail">
+        <div>
+            <section>
+                <header>
+                    <h2>Aplicações escaláveis lidam bem com falhas</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="DealingWithFailures">
+        <div>
+            <section>
+                <blockquote>
+                    <p>If you can name it, it can fail.</p>
+                </blockquote>
+                <p>- Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="EliminateSPOF">
+        <div>
+            <section>
+                <header>
+                    <h2>Elimine SPOF's</h2>
+                </header>
+                <p>Pontos únicos de falha (SPOF - single point of failure) representam um grande risco para a aplicação.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="EliminateSPOFPic">
+        <div>
+            <section>
+                <header>
+                    <h2>Elimine SPOF's</h2>
+                </header>
+                <img src="pictures/spof.png" alt="single point of failure">
+                <div class="overlay build">
+                    <br><br>O que acontece se o MySQL falhar?
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Broken2">
+        <div>
+            <section>
+                <img src="pictures/explode.jpg" alt="Código quebrado">
+                <p class="right">http://www.flickr.com/photos/11704965@N03/2846657279/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="CheckForFailures">
+        <div>
+            <section>
+                <blockquote>
+                    <p>If something can fail, make sure it does.</p>
+                </blockquote>
+                <p>Rajiv Eranki, 2012.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="Database">
+        <div>
+            <section>
+                <header>
+                    <h2>Banco de dados</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="RightTool">
+        <div>
+            <section>
+                <img src="pictures/right-tool.jpg" alt="Utilize a ferramenta correta!">
+                <p>http://www.flickr.com/photos/justinbaeder/5317820857/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="RDBMS">
+        <div>
+            <section>
+                <header>
+                    <h2>Bancos de dados relacionais</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Relacionamento entre entidades</li>
+                    <li>
+                        ACID
+                        <ul>
+                            <li>Atomicity</li>
+                            <li>Consistency</li>
+                            <li>Isolation</li>
+                            <li>Durability</li>
+                        </ul>
+                    </li>
+                    <li>Mais difícil de escalar.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="NoSQL">
+        <div>
+            <section>
+                <header>
+                    <h2>NoSQL</h2>
+                </header>
+                <ul class="build-list">
+                    <li><b>N</b>ot <b>o</b>nly <b>SQL</b></li>
+                    <li>Classifica diversos tipos diferentes de bancos de dados</li>
+                    <li>Em geral, bancos de dados que abrem mão de algumas garantias do modelo relacional</li>
+                    <li>Muito mais fáceis de escalar (menor compromisso com consistência)</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="CacheAsMuchAsYouCan">
+        <div>
+            <section>
+                <header>
+                    <h2>Abuse do cache</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Decide">
+        <div>
+            <section>
+                <img src="pictures/confuse.jpg" alt="Decide yourself!">
+                <p>http://www.flickr.com/photos/acearchie/4369849179/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="CacheEverything">
+        <div>
+            <section>
+                <blockquote>
+                    <p>By caching at every level from the browser through the cloud, your network, application servers, and even databases, one can significantly increase one’s ability to scale.</p>
+                </blockquote>
+                <p>Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="PageCache">
+        <div>
+            <section>
+                <header>
+                    <h2>Page cache</h2>
+                </header>
+                <p>Page caches ajudam a lidar com falhas e aumentam a performance de uma aplicação web, preservando o backend de executar tarefas repetitivas em excesso.</p>
+                <ul>
+                    <li><a href="https://www.varnish-cache.org" target="_blank">Varnish</a></li>
+                    <li><a href="http://www.squid-cache.org" target="_blank">Squid</a></li>
+                    <li><s><a href="http://nginx.org" target="_blank">nginx</a></s></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ObjectCache">
+        <div>
+            <section>
+                <header>
+                    <h2>Object cache</h2>
+                </header>
+                <p>Pode ser utilizado para cachear objetos que custam caro de ser calculados, e não mudam muito. (e.g.: resultado de uma chamada HTTP a uma API externa, resultado de uma consulta no banco de dados, etc.).</p>
+                <ul>
+                    <li><a href="http://memcached.org" target="_blank">memcached</a></li>
+                    <li><a href="http://redis.io" target="_blank">redis</a></li>
+                    <li><a href="http://www.erlang.org/doc/man/mnesia.html" target="_blank">Mnesia</a></li>
+                    <li>Qualquer key-value storage distribuído :)</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="UseCDN">
+        <div>
+            <section>
+                <header>
+                    <h2>Use CDNs</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="UseCDNQuote">
+        <div>
+            <section>
+                <blockquote>
+                    <p>The easiest way to handle a huge amount of user traffic is to avoid it.</p>
+                </blockquote>
+                <p>Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsCDN1">
+        <div>
+            <section>
+                <header>
+                    <h2>Use CDNs</h2>
+                </header>
+                <p>CDN (content delivery network) é um sistema distribuído de distribuição de conteúdo.</p>
+                <p>Em geral, trata-se de um serviço "deployado" mundialmente, com o objetivo de servir o conteúdo de uma aplicação a partir do melhor lugar possível (proximidade, velocidade de conexão, etc.).</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhichCDNToUse">
+        <div>
+            <section>
+                <header>
+                    <h2>Use CDNs</h2>
+                </header>
+                <ul>
+                    <li><a href="http://www.akamai.com" target="_blank">Akamai Technologies</a></li>
+                    <li><a href="http://aws.amazon.com/cloudfront/" target="_blank">Amazon CloudFront</a></li>
+                    <li><a href="http://www.edgecast.com/" target="_blank">EdgeCast</a></li>
+                    <li><a href="http://www.limelight.com/" target="_blank">Limelight Networks</a></li>
+                    <li><a href="http://www.windowsazure.com/en-us/home/features/caching/" target="_blank">Windows Azure CDN</a></li>
+                    <li>etc.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhyCDN">
+        <div>
+            <section>
+                <header>
+                    <h2>Use CDNs</h2>
+                </header>
+                <ul class="build-list">
+                    <li>CDNs são extremamente poderosas e largamente utilizadas para servir conteúdo estático e de mídia (streaming).</li>
+                    <li>Alguns provedores de serviço já suportam conteúdo dinâmico e fragmentos (Akamai).</li>
+                    <li>Ponto fraco das CDNs: Google Public DNS e OpenDNS.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide center" id="CDNvsDNS">
+        <div>
+            <section>
+                <header>
+                    <h2>CDN vs DNS públicos</h2>
+                </header>
+                <img src="pictures/cdnvsdns.png" alt="Google Public DNS vs Amazon CloudFront">
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="Rollback">
+        <div>
+            <section>
+                <header>
+                    <h2>Rollback!</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="FailingRollback">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Failing to design for rollback is designing for failure.</p>
+                </blockquote>
+                <p>Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Developers">
+        <div>
+            <section>
+                <header>
+                    <h2 class="right">Developers, developers,<br>developers, developers,<br>developers!</h2>
+                </header>
+                <img src="pictures/steve-ballmer.jpg" alt="Steve Ballmer">
+                <p class="black">http://www.flickr.com/photos/wiredphotostream/6302995233/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="KISS">
+        <div>
+            <section>
+                <header>
+                    <h2 class="right">Keep it simple!</h2>
+                </header>
+                <img src="pictures/complex.jpg" alt="Gambiarra">
+                <p>http://www.flickr.com/photos/alphachimpstudio/2871063043/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="CodeSimple">
+        <div>
+            <section>
+                <blockquote>
+                    <p>The more complex you make your system the more you are likely to suffer from availability issues.</p>
+                </blockquote>
+                <p>Martin L. Abbott, Michael T. Fisher, 2011.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="AvoidState">
+        <div>
+            <section>
+                <header>
+                    <h2>Evite estado!</h2>
+                </header>
+                <p>Aplicações que não armazenam estado são mais fáceis de escalar.</p>
+                <div>
+                    <img src="pictures/state.png" alt="state" class="build">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="LoginState">
+        <div>
+            <section>
+                <header>
+                    <h2>Exemplo de estado: <span class="build">autenticação</span></h2>
+                </header>
+                <div>
+                    <img src="pictures/login.png" alt="Login" class="build">
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="DistributeState">
+        <div>
+            <section>
+                <header>
+                    <h2>Distribua o estado!</h2>
+                </header>
+                <p>Se armazenar estado é inevitável, utilize um armazenamento distribuído.</p>
+                <ul class="build-list">
+                    <li>banco de dados</li>
+                    <li>sistema de arquivos</li>
+                    <li>etc.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="Concurrency">
+        <div>
+            <section>
+                <header>
+                    <h2>Abrace a concorrência!</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ThinkConcurrently">
+        <div>
+            <section>
+                <header>
+                    <h2>Abrace a concorrência</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Projetar para alta concorrência implica em projetar para escalar</li>
+                    <li>Afinal de contas, escalar é ser capaz de responder um maior número de requisições concorrentes</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout cover black" id="OneMoreThing">
+        <div>
+            <section>
+                <header>
+                    <h2>One more thing...</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="HuntBottlenecks1">
+        <div>
+            <section>
+                <header>
+                    <h2>Caçe gargalos!</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="HuntBottlenecks2">
+        <div>
+            <section>
+                <header>
+                    <h2>Caçe gargalos!</h2>
+                </header>
+                <p>Caçe gargalos, de maneira eficiente, usando ferramentas de profiling, teste de carga, detecção de data races, etc.</p>
+                <ul class="build-list">
+                    <li><a href="http://code.google.com/p/gperftools/" target="_blank">gperftools</a></li>
+                    <li><a href="http://docs.python.org/library/profile.html#module-cProfile" target="_blank">cProfile</a></li>
+                    <li><a href="http://valgrind.org" target="_blank">Valgrind</a></li>
+                    <li><a href="http://httpd.apache.org/docs/trunk/programs/ab.html" target="_blank">ab (Apache Benchmark)</a></li>
+                    <li><a href="http://www.joedog.org/siege-home/" target="_blank">Siege</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ThankYou">
+        <div>
+            <section>
+                <header>
+                    <h2>Dúvidas? Obrigado!</h2>
+                </header>
+                <p>Francisco Souza<br>fss@corp.globo.com</p>
+                <ul>
+                    <li><a href="http://twitter.com/franciscosouza">twitter.com/franciscosouza</a></li>
+                    <li><a href="http://f.souza.cc">f.souza.cc</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="progress"><div></div></div>
+    <script src="/themes/scripts/script.js"></script>
+    <!-- Copyright © 2010–2012 Vadim Makeev — pepelsbey.net -->
+</body>
+</html>

@@ -1,0 +1,71 @@
+#Cover h2 {
+    color: #444;
+    font-size:80px;
+    margin-bottom:180px;
+}
+#Cover h3 {
+    font-size: 40px;
+    line-height: 30px;
+}
+#Cover img {
+    bottom: 60px;
+    position: absolute;
+    left: 50%;
+    margin-left: -80px;
+}
+#Myths ol li:last-child:before {
+    content: '';
+}
+#Myths img {
+    bottom: 150px;
+    position: absolute;
+    right: 350px;
+}
+#ScalingUpFailingUp blockquote {
+    font-size:80px;
+}
+#PerformanceVsScalability h2, #UltraUpload2 h2, #Concurrency h2 {
+    margin-top: -50px;
+}
+#WhatIsScalability3 ol {
+    counter-reset: whatisscalability 3;
+}
+#WhatIsScalability3 ol > li:before {
+    content: counter(whatisscalability) ". ";
+    counter-increment: whatisscalability;
+}
+#DealingWithFailures blockquote {
+    font-size: 60px;
+}
+#CheckForFailures blockquote {
+    font-size: 46px;
+}
+#EliminateSPOFPic img {
+    margin-top: -30px;
+}
+#EliminateSPOFPic section {
+    text-align: center;
+}
+#EliminateSPOFPic section > header > h2 {
+    text-align: left;
+}
+#ScalabilityIsNot blockquote, #ElasticityAdvantage blockquote, #Reducing blockquote, #CodeSimple blockquote {
+    margin-top: 50px;
+}
+#CacheEverything blockquote {
+    margin-top: 0;
+}
+#ProjectToFail h2 {
+    margin-top: -50px;
+}
+#CDNVsGooglePublicDNS header {
+    margin-top: -30px;
+}
+#Developers h2 {
+    background: none;
+    font-size: 60px;
+    text-align: right;
+}
+#LoginState section > div, #AvoidState section > div {
+    text-align: center;
+}
