@@ -1,0 +1,48 @@
+#Who #grown {
+    -moz-transform: rotate(10deg);
+    -webkit-transform: rotate(10deg);
+    border-radius: 5px;
+    position: absolute;
+    right: 250px;
+    top: 140px;
+}
+#Who #child {
+    -moz-transform: rotate(-4deg);
+    position: absolute;
+    right: 40px;
+    top: 120px;
+}
+#Cover section div {
+    margin-top: 120px;
+    text-align: center;
+}
+#BuiltinThreading blockquote {
+    margin-top: 120px;
+}
+#BadGIL .overlay {
+    font-weight: bold;
+}
+#DequeImplementation blockquote {
+    margin-top: 0;
+}
+#WhatIf h2, #StupidThread pre, #CodeSamplesLocking section > pre:first-child {
+    margin-top: -50px;
+}
+#CodeSamplesLocking:after {
+    content: '';
+}
+#ArminOnLocals blockquote {
+    margin-top: 50px;
+}
+#HowMultiprocessingWorks section > ul > li:last-child:before {
+    content: '';
+}
+#HowMultiprocessingWorks section >ul > li:last-child {
+    margin-top: 30px;
+}
+#concurrentfutures h2 {
+    margin-top: -50px;
+}
+.slide.shout.freddie section {
+    background: url(pictures/freddie-mercury.png) 740px 200px no-repeat #FFF;
+}

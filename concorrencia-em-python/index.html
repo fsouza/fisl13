@@ -1,0 +1,991 @@
+<!DOCTYPE HTML>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Concorrência em Python | Francisco Souza</title>
+    <meta name="viewport" content="width=1274, user-scalable=no">
+    <link rel="stylesheet" href="/themes/fisl13/styles/style.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="list">
+    <div class="slide" id="Cover">
+        <div>
+            <section>
+                <header>
+                    <h2>Concorrência em Python</h2>
+                </header>
+                <h3>Francisco Souza</h3>
+                <p>fss@souza.cc</p>
+                <div>
+                    <img src="pictures/pythonbrasil_logo.png" alt="Python Brasil" />
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Agenda">
+        <div>
+            <section>
+                <header>
+                    <h2>Agenda</h2>
+                </header>
+                <ol>
+                    <li>O GIL é mau?</li>
+                    <li>O modelo tradicional de threads e o módulo threading</li>
+                    <li>Green threads</li>
+                    <li>CSP (Communicating Sequential Processes) e message passing</li>
+                    <li>Stackless Python</li>
+                    <li>STM (Software Transactional Memory) e o PyPy</li>
+                    <li>concurrent.futures e o Python 3</li>
+                </ol>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="GIL">
+        <div>
+            <section>
+                <header>
+                    <h2>GIL</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="BadGIL">
+        <div>
+            <section>
+                <header>
+                    <h2>O GIL é mau?</h2>
+                </header>
+                <p>O GIL é mau, ele não nos permite desenvolver aplicações concorrentes!</p>
+                <div class="build overlay red">
+                    <br><br>ERRADO!
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsGIL">
+        <div>
+            <section>
+                <header>
+                    <h2>O que é o GIL?</h2>
+                </header>
+                <p>GIL (Global Interpreter Locker) é um mecanismo de exclusão mútua do interpretador.</p>
+                <p class="build">Isso significa que apenas uma thread pode executar instruções por vez.</p>
+                <p class="build">Entretanto, o GIL tem IO não bloqueante.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatsWrongWithGIL">
+        <div>
+            <section>
+                <header>
+                    <h2>Qual o problema com o GIL, então?</h2>
+                </header>
+                <p>Threads CPU-bound "lutando" pelo GIL.</p>
+                <p>Tentativas frustradas de locking, e também lockings concorrentes, atrasam a execução das threads.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="SummingNumbers">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando números</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="QueryingTheDatabase">
+        <div>
+            <section>
+                <header>
+                    <h2>Consultas no banco de dados</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ConcurrencyPatterns">
+        <div>
+            <section>
+                <header>
+                    <h2>Padrões de concorrência</h2>
+                </header>
+                <ul>
+                    <li>Shared state</li>
+                    <li>Message passing<br />&nbsp;</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="SharedShoot">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Use locks and shared memory to shoot yourself in the foot in parallel. </p>
+                </blockquote>
+                <p>- Python wiki</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="HowSharedStateWorks">
+        <div>
+            <section>
+                <header>
+                    <h2>Como funciona?</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Informação compartilhada entre threads</li>
+                    <li>Acesso através de mecanismos de sincronização</li>
+                    <li>Pode ser um tiro no pé</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="MultipleThreads">
+        <div>
+            <section>
+                <header>
+                    <h2>Como dar um tiro no pé?</h2>
+                </header>
+                <p>Limitando a escalabilidade do algoritmo através de locks.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="StupidThread">
+        <div>
+            <section>
+<pre class="build mark-code">
+import threading
+import time
+
+N_THREADS = 4
+mutex = threading.Lock()
+
+class StupidThread(threading.Thread):
+
+    def run(self):
+        <mark>mutex.acquire()
+        time.sleep(1)
+        mutex.release()</mark>
+
+threads = []
+for i in range(N_THREADS):
+    t = StupidThread()
+    t.start()
+    threads.append(t)
+for t in threads:
+    t.join()
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="HowTo">
+        <div>
+            <section>
+                <header>
+                    <h2>Como fazer, então?</h2>
+                </header>
+                <p>Distribua o estado!</p>
+                <p class="build">Se você realmente precisa acessar um objeto compartilhado entre as threads, faça de forma isolada, e fique o menor tempo possível com um lock (o GIL já é suficiente).</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CodeSamplesLocking">
+        <div>
+            <section>
+<pre>
+total = 0
+for i in xrange(1, 1000000, 2):
+    total += i
+</pre>
+<div class="build">
+<pre class="build mark-code">
+class DumbestSum(threading.Thread):
+
+    def __init__(self, start, end):
+        super(DumbestSum, self).__init__()
+        self.begin = start
+        self.end = end
+
+    def run(self):
+        global total
+        for n in xrange(self.begin, self.end, 2):
+            <mark>mutex.acquire()</mark>
+            total += n
+            <mark>mutex.release()</mark>
+</pre>
+</div>
+<pre class="build build-code">
+% time python dumbest_sum.py
+The sum is 250000000000.
+1.708u 3.852s <mark>0:03.80</mark> 146.0%	0+0k 0+0io 0pf+0w
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ThreadLocalsAPI">
+        <div>
+            <section>
+                <header>
+                    <h2>Thread-local storage</h2>
+                </header>
+                <p>Storage de variáveis visível apenas por threads.</p>
+                <p class="build">Um grande hack, mas ainda útil.</p>
+<pre class="build">
+tls = threading.local()
+tls.total = 0
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide quote" id="ArminOnLocals">
+        <div>
+            <section>
+                <blockquote>
+                    <p>Thread locals are a hack. Imagine how cool programming would be if each function was invoked with a context though.</p>
+                </blockquote>
+                <p>- Armin Ronacher</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SuckingLessSum">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando com thread locals</h2>
+                </header>
+<pre class="build mark-code">
+class LocalSum(threading.Thread):
+
+    def __init__(self, start, end):
+        super(LocalSum, self).__init__()
+        self.begin = start
+        self.end = end
+
+    def run(self):
+        global total
+        <mark>tls = threading.local()
+        tls.total = 0</mark>
+        for n in xrange(self.begin, self.end, 2):
+            <mark>tls.total += n</mark>
+        mutex.acquire()
+        <mark>total += tls.total</mark>
+        mutex.release()
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TimeLocalSum">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando com thread locals</h2>
+                </header>
+<pre class="build build-code">
+% time python local_sum.py
+The sum is 250000000000.
+0.184u 0.053s <mark>0:00.20</mark> 115.0%	0+0k 0+0io 0pf+0w
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="GlobalProblem">
+        <div>
+            <section>
+                <header>
+                    <h2>Ainda um problema: <code>global</code></h2>
+                </header>
+<pre>
+    def run(self):
+        <mark class="important">global</mark> total
+        tls = threading.local()
+        tls.total = 0
+        for n in xrange(self.begin, self.end, 2):
+            tls.total += n
+        mutex.acquire()
+        total += tls.total
+        mutex.release()
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="RethinkingTheModel">
+        <div>
+            <section>
+                <header>
+                    <h2>Por que este modelo?</h2>
+                </header>
+                <p>O modelo de execução de threads é a forma como o sistema operacional interage com o processador.</p>
+                <p>Um processo é composto por várias threads, e o processador executa threads, que são gerenciadas pelo kernel.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="FactAboutTheModel">
+        <div>
+            <section>
+                <header>
+                    <h2>Por que este modelo?</h2>
+                </header>
+                <p>Quando usamos threads desta maneira, estamos trazendo a forma como o sistema operacional se comunica com o processador para uma linguagem de programação de alto nível.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Fail">
+        <div>
+            <section>
+                <header>
+                    <h2 class="right">Fail</h2>
+                </header>
+                <img src="pictures/fail.jpg" alt="Fail">
+                <p></p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="AlternativesToThreads">
+        <div>
+            <section>
+                <header>
+                    <h2><s>Abstrações </s>Alternativas?</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Green threads</li>
+                    <li>STM (Software transactional memory)</li>
+                    <li>CSP (Communicating Sequential Processes)<br>&nbsp;</li>
+                    <li>Stackless Python</li>
+                    <li>multiprocessing</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="GreenThreads">
+        <div>
+            <section>
+                <header>
+                    <h2>Green Threads</h2>
+                </header>
+                <ul>
+                    <li>Threads no user space.</li>
+                    <li>Representam uma abstração às threads do sistema operacional (kernel space).</li>
+                    <li>Mapeamento N pra 1 com threads no kernel space.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="greenlets">
+        <div>
+            <section>
+                <header>
+                    <h2>greenlets</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Implementação de green threads em Python.</li>
+                    <li>Um greenlet é "equivalente" a uma thread, porém mais barato.</li>
+                    <li>Permite um modelo diferente de programação concorrente, já que é mais barato.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="GreenSum">
+        <div>
+            <section>
+                <header>
+                    <h2>Somando com greenlets</h2>
+                </header>
+<pre style="height: 355px;" class="build mark-code">
+class GreenSum(<mark>greenlet.greenlet</mark>):
+
+    def __init__(self, start, end):
+        super(GreenSum, self).__init__()
+        self.begin = start
+        self.end = end
+
+    def run(self):
+        <mark class="another">global total</mark>
+        sum = 0
+        for n in xrange(self.begin, self.end, 2):
+            sum += n
+        <mark class="another">total += sum</mark>
+
+N_GREENS = 5000
+increment = 10000000 / N_GREENS
+start = 1
+for i in range(N_GREENS):
+    <mark>GreenSum(start, start+increment).switch()</mark>
+    start += increment
+print "Sum is %d" % total
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="greenletsadvantage">
+        <div>
+            <section>
+                <header>
+                    <h2>greenlets vs threads</h2>
+                </header>
+                <ul class="build-list">
+                    <li>
+                        Vantagens dos greenlets:
+                        <ul>
+                            <li>Muito baratos</li>
+                            <li>API mais simples</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Desvantagens:
+                        <ul>
+                            <li>Scheduler não preemptivo</li>
+                            <li>Problemas com o garbage collector</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="STM">
+        <div>
+            <section>
+                <header>
+                    <h2>STM</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="STMWhat">
+        <div>
+            <section>
+                <header>
+                    <h2>WTF STM?!</h2>
+                </header>
+                <ul class="build-list">
+                    <li><b>S</b>oftware <b>T</b>ransactional <b>M</b>emory</li>
+                    <li>Paradigma de controle de concorrência que trabalha com transações em memória, de forma semelhante aos bancos de dados</li>
+                    <li>Cada transação roda de forma isolada, e um gerenciador de transação faz todo o controle do acesso aos dados, com locks "fine-grained".</li>
+                    <li>O gerenciador pode ser implementado com algoritmos lock-free ou usando locks.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="STMPython">
+        <div>
+            <section>
+                <header>
+                    <h2>STM no Python</h2>
+                </header>
+                <p>Armin Rigo, commiter do PyPy, iniciou uma branch com suporte a threads usando STM.</p>
+                <p class="build">Ele também apresentou uma proposta de que o trabalho para adicionar suporte a threads com STM que ele vem executando no PyPy também pode ser aplicado ao CPython, chegando a criar um fork do CPython com atomic locks.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="multiprocessing">
+        <div>
+            <section>
+                <header>
+                    <h2>multiprocessing</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="WhatIsMultiprocessing">
+        <div>
+            <section>
+                <header>
+                    <h2>multiprocessing</h2>
+                </header>
+                <ul class="build-list">
+                    <li>tr00 paralelismo através de múltiplos processos Python</li>
+                    <li>Comunicação principalmente através de envio de mensagens</li>
+                    <li>Maior overhead de sincronização</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SumWithMultiprocessing">
+        <div>
+            <section>
+<pre style="height: 500px; margin-top: -50px;" class="build mark-code">
+import multiprocessing
+
+
+def sum(q, start, end):
+    value = 0
+    for n in xrange(start, end, 2):
+        value += n
+    <mark>q.put(value)</mark>
+
+N_PROCS = 8
+procs = []
+increment = 1000000 / N_PROCS
+start = 1
+<mark>values = multiprocessing.Queue()</mark>
+
+for i in range(N_PROCS):
+    p = multiprocessing.Process(target=sum, args=(<mark>values</mark>, start, start + increment))
+    p.start()
+    start += increment
+    procs.append(p)
+
+for p in procs:
+    p.join()
+
+total = 0
+<mark>while not values.empty():
+    total += values.get()</mark>
+print "The sum is %d." % total
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="HowMultiprocessingWorks">
+        <div>
+            <section>
+                <header>
+                    <h2>Como multiprocessing funciona?</h2>
+                </header>
+                <ul class="build-list">
+                    <li>O processo master cria filhos utilizando <code>os.fork</code></li>
+                    <li>
+                        Para compartilhar memória, o módulo <code>multiprocessing</code> fornece alguns tipos além do <code>Queue</code>:
+                        <ul>
+                            <li>Array</li>
+                            <li>Value</li>
+                        </ul>
+                    </li>
+                    <li>
+<pre>
+num = Value('d', 0.0)
+arr = Array('i', range(10))
+</pre>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="BlueScreen">
+        <div>
+            <section>
+                <img src="pictures/blue-screen.jpg" alt="Blue screen">
+                <p>http://www.flickr.com/photos/romkey/21221557/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="CSP">
+        <div>
+            <section>
+                <header>
+                    <h2>CSP</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CSPWhat">
+        <div>
+            <section>
+                <header>
+                    <h2>CS... wat?!</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Communicating Sequential Processes</li>
+                    <li>Definido por C.A.R. Hoare (famoso pelo Quick Sort)</li>
+                    <li>Princípio básico de message passing</li>
+                    <li>Processos são executados de forma concorrente, utilizando canais para sincronização e comunicação</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CSPSample">
+        <div>
+            <section>
+                <header>
+                    <h2>CSP (Exemplo)</h2>
+                </header>
+<pre>
+PROC foo (CHAN INT out!)
+    out ! 42
+:
+
+PROC bar (CHAN INT in?)
+    INT v:
+    SEQ
+        in ? v
+:
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="python-csp">
+        <div>
+            <section>
+                <header>
+                    <h2>python-csp</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="CSPSum">
+        <div>
+            <section>
+<pre style="margin-top:-20px;" class="build mark-code">
+<mark class="another">@csp.process</mark>
+def sum(<mark>ch</mark>, begin, end):
+    value = 0
+    for n in xrange(begin, end, 2):
+        value += n
+    <mark>ch.write(value)</mark>
+
+N_PROCS = 50
+increment = 1000000 / N_PROCS
+start = 1
+<mark>ch = csp.Channel()</mark>
+for i in range(N_PROCS):
+    <mark class="another">proc = sum(ch, start, start + increment)
+    proc.start()</mark>
+total = 0
+for i in range(N_PROCS):
+    total += <mark>ch.read()</mark>
+print "Sum is %d." % total
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout freddie" id="NoSharedState">
+        <div>
+            <section>
+                <header>
+                    <h2>No shared state</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout freddie" id="NoMutex">
+        <div>
+            <section>
+                <header>
+                    <h2>No mutual exclusion</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="HowItWorks">
+        <div>
+            <section>
+                <header>
+                    <h2>Como o python-csp funciona?</h2>
+                </header>
+                <p>O <a href="https://code.google.com/p/python-csp" target="_blank">python-csp</a> é uma camada de abstração sobre os mecanismos de concorrência padrão do Python (<code>multiprocessing</code> e <code>threading</code>).</p>
+                <p>Por padrão, usa <code>multiprocessing</code>.</p>
+                <p class="build">Para usar threads, basta exportar a variável de ambiente <code>CSP</code> com o valor <code>"THREAD"</code>.</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="MacOSBug">
+        <div>
+            <section>
+                <img src="pictures/mac.jpg" alt="Mac OS">
+                <p>http://www.flickr.com/photos/29046198@N05/2759488736/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="SynchronousChannels">
+        <div>
+            <section>
+                <header>
+                    <h2>Canais são síncronos</h2>
+                </header>
+<pre class="build">
+import csp.csp as csp
+
+ch = csp.Channel()
+csp.write(10)
+</pre>
+<pre class="build">
+import csp.csp as csp
+
+ch = csp.Channel()
+csp.read()
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="TestingConcurrentApps">
+        <div>
+            <section>
+                <header>
+                    <h2>Testando aplicações concorrentes</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="IsItHard">
+        <div>
+            <section>
+                <header>
+                    <h2>É difícil?</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TestCSPSum">
+        <div>
+            <section>
+                <header>
+                    <h2>Testando a soma com python-csp</h2>
+                </header>
+<pre>
+class SumTestCase(unittest.TestCase):
+
+    def test_sum_odd_integers_from_start_to_end(self):
+        ch = csp.Channel()
+        proc = csp_sum.sum(ch, 1, 10)
+        proc.start()
+        self.assertEqual(25, ch.read())
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TestingThreads">
+        <div>
+            <section>
+                <header>
+                    <h2>E com threads explícitas!</h2>
+                </header>
+<pre>
+class LocalSumTestCase(unittest.TestCase):
+
+    def setUp(self):
+        local_sum.total = 0
+
+    def test_should_sum_odd_numbers_from_begin_to_end(self):
+        t = local_sum.LocalSum(start=1, end=10)
+        t.start()
+        t.join()
+        self.assertEqual(local_sum.total, 25)
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="MoreComplex">
+        <div>
+            <section>
+                <header>
+                    <h2>Um exemplo um pouco mais complexo...</h2>
+                </header>
+                <ul>
+                    <li>Um sistema de elevadores que atende a requisições.</li>
+                    <li>Se houver algum elevador livre, o cliente pode entrar nele.</li>
+                    <li>Caso não haja elevador livre, o cliente espera.</li>
+                    <li>Caso não haja clientes, o elevador fica parado, esperando por clientes.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="HandsOn">
+        <div>
+            <section>
+                <img src="pictures/handson.jpg" alt="Hands on">
+                <p class="black">http://www.flickr.com/photos/bexa2010/6083852674/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="concurrentfutures">
+        <div>
+            <section>
+                <header>
+                    <h2>Python 3:<br><span class="build">concurrent.futures</span></h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="cfwhat">
+        <div>
+            <section>
+                <header>
+                    <h2>concurrent.futures</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Abstração (multiprocessing e threading) de execução de tarefas concorrentes e paralelas na biblioteca padrão</li>
+                    <li>Trabalha com um pool de executors (que podem ser processos ou threads)</li>
+                    <li>Incluso no Python 3.2</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="cfsum">
+        <div>
+            <section>
+<pre class="build mark-code" style="height: 500px; margin-top: -50px;">
+from concurrent import futures
+
+
+def sum(start, end):
+    value = 0
+    for n in range(start, end, 2):
+        value += n
+    return value
+
+if __name__ == '__main__':
+    N_WORKERS = 10
+    increment = 1000000 // N_WORKERS
+    start = 1
+    begins = []
+    ends = []
+    for i in range(N_WORKERS):
+        begins.append(start)
+        ends.append(start + increment)
+        start += increment
+    with <mark>futures.ProcessPoolExecutor(max_workers=N_WORKERS)</mark> as <mark>exec</mark>:
+        values = <mark>exec.map</mark>(sum, begins, ends)
+        result = 0
+        for v in values:
+            result += v
+        print("Sum is %d" % result)
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="MoreAboutconcurrentfutures">
+        <div>
+            <section>
+                <header>
+                    <h2>Mais informações</h2>
+                </header>
+                <p>Mais informações sobre <code>concurrent.futures</code>:</p>
+                <ul>
+                    <li><a href="http://docs.python.org/dev/library/concurrent.futures.html" target="_blank">http://docs.python.org/dev/library/concurrent.futures.html</a></li>
+                    <li><a href="http://pypi.python.org/pypi/futures/" target="_blank">http://pypi.python.org/pypi/futures/</a> (backport para Python 2)</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover w" id="Bonus">
+        <div>
+            <section>
+                <img src="pictures/bonus.jpg" alt="Mario">
+                <p>http://www.flickr.com/photos/teamblackdragons01/6714155397/</p>
+            </section>
+        </div>
+    </div>
+    <div class="slide shout" id="StacklessPython">
+        <div>
+            <section>
+                <header>
+                    <h2>Stackless Python</h2>
+                </header>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Tasklets">
+        <div>
+            <section>
+                <header>
+                    <h2>Stackless Python</h2>
+                </header>
+                <ul class="build-list">
+                    <li>Concorrência baseada em tasklets (green thread)</li>
+                    <li>Também utiliza canais síncronos para comunicação e sincronização de tasks</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="TaskletsSum">
+        <div>
+            <section>
+<pre style="margin-top: -40px;" class="build mark-code">
+import stackless
+
+
+def sum(ch, begin, end):
+    value = 0
+    for n in xrange(begin, end, 2):
+        value += n
+    <mark>ch.send(value)</mark>
+
+if __name__ == '__main__':
+    N_TASKS = 50
+    increment = 1000000 / N_TASKS
+    start = 1
+    ch = stackless.channel()
+    for i in range(N_TASKS):
+        <mark class="another">task = stackless.tasklet(sum)
+        task.setup(ch, start, start + increment)</mark>
+    total = 0
+    for i in range(N_TASKS):
+        total += <mark>ch.receive()</mark>
+    print "Sum is %d." % total
+</pre>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="StacklessVSCSP">
+        <div>
+            <section>
+                <header>
+                    <h2>Stackless Python vs. python-csp</h2>
+                </header>
+                <ul class="build-list">
+                    <li>
+                        Vantagens do Stackless Python:
+                        <ul>
+                            <li>muito mais rápido do que o python-csp</li>
+                            <li>funciona bem em diferentes ambientes</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Desvantagens do Stackless Python:
+                        <ul>
+                            <li>É um fork do Python</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Características pra você avaliar:
+                        <ul>
+                            <li>O Stackless Python utiliza green threads, enquanto o python-csp utiliza multiprocessing ou threads propriamente ditas</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide cover" id="PythonBrasil">
+        <div>
+            <section>
+            <img src="pictures/slide_pythonbrasil8.png" alt="PythonBrasil[8]" />
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="ThankYou">
+        <div>
+            <section>
+                <header>
+                    <h2>Dúvidas? Obrigado!</h2>
+                </header>
+                <p>Francisco Souza<br>fss@souza.cc</p>
+                <ul>
+                    <li><a href="http://twitter.com/franciscosouza">twitter.com/franciscosouza</a></li>
+                    <li><a href="http://f.souza.cc">f.souza.cc</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="slide" id="Links">
+        <div>
+            <section>
+                <header>
+                    <h2>Links</h2>
+                </header>
+                <ul>
+                    <li><a href="http://docs.python.org/library/threading" target="_blank">threading</a></li>
+                    <li><a href="http://greenlet.readthedocs.org/" target="_blank">greenlet</a></li>
+                    <li><a href="http://en.wikipedia.org/wiki/Software_transactional_memory" target="_blank">STM</a></li>
+                    <li><a href="http://docs.python.org/library/multiprocessing.html" target="_blank">multiprocessing</a></li>
+                    <li><a href="https://code.google.com/p/python-csp" target="_blank">python-csp</a></li>
+                    <li><a href="http://docs.python.org/dev/library/concurrent.futures.html" target="_blank">concurrent.futures</a></li>
+                    <li><a href="http://www.stackless.com/" target="_blank">Stackless Python</a></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="progress"><div></div></div>
+    <script src="/themes/scripts/script.js"></script>
+    <!-- Copyright © 2010–2012 Vadim Makeev — pepelsbey.net -->
+</body>
+</html>
