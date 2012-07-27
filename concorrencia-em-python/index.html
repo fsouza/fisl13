@@ -673,7 +673,7 @@ print "Sum is %d." % total
                 </header>
                 <p>O <a href="https://code.google.com/p/python-csp" target="_blank">python-csp</a> é uma camada de abstração sobre os mecanismos de concorrência padrão do Python (<code>multiprocessing</code> e <code>threading</code>).</p>
                 <p>Por padrão, usa <code>multiprocessing</code>.</p>
-                <p class="build">Para usar threads, basta exportar a variável de ambiente <code>CSP</code> com o valor <code>"THREAD"</code>.</p>
+                <p class="build">Para usar threads, basta exportar a variável de ambiente <code>CSP</code> com o valor <code>"THREADS"</code>.</p>
             </section>
         </div>
     </div>
@@ -695,13 +695,13 @@ print "Sum is %d." % total
 import csp.csp as csp
 
 ch = csp.Channel()
-csp.write(10)
+ch.write(10)
 </pre>
 <pre class="build">
 import csp.csp as csp
 
 ch = csp.Channel()
-csp.read()
+ch.read()
 </pre>
             </section>
         </div>
