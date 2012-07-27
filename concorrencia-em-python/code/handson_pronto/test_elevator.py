@@ -18,6 +18,17 @@ class ElevatorTestCase(unittest.TestCase):
             chan.poison()
             transport.assert_called_with("Francisco")
 
+    def test_elevator_runs_in_a_loop(self):
+        with mock.patch("elevator.transport") as transport:
+            chan = csp.Channel()
+            proc = elevator.elevator(chan)
+            proc.start()
+            chan.write("Francisco")
+            chan.write("Chico")
+            chan.write("Xikin")
+            chan.poison()
+            self.assertEqual(3, transport.call_count)
+
     def test_people_should_write_names_to_channel_and_poison_it(self):
         chan = csp.Channel()
         proc = elevator.people(chan, ["Francisco", "Chico"])
