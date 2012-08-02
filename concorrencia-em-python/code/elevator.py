@@ -7,7 +7,7 @@ import csp.csp as csp
 @csp.process
 def elevator(chan):
     while True:
-        print "Transportando %s" % chan.read()
+        print "Transporting %s" % chan.read()
         time.sleep(2)
 
 
